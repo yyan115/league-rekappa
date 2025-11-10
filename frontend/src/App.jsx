@@ -26,7 +26,7 @@ function App() {
     return 'gold';
   };
 
-  const handleAnalyze = async (summonerName, region, proPlayerId, forceRefresh = false) => {
+  const handleAnalyze = async (summonerName, region, forceRefresh = false) => {
     setLoading(true);
     setError(null);
     setResults(null);
@@ -83,10 +83,6 @@ function App() {
         region: region
       };
 
-      if (proPlayerId) {
-        requestBody.pro_player_id = proPlayerId;
-      }
-
       // Use fetch with streaming
       const response = await fetch('/api/analyze-stream', {
         method: 'POST',
@@ -136,7 +132,6 @@ function App() {
                   your_stats: data.result.your_stats,
                   your_rank: data.result.your_rank,
                   achievements: data.result.achievements || [],
-                  mode: data.result.mode,
                   used_topics: data.result.used_topics || []
                 };
                 sessionStorage.setItem(cacheKey, JSON.stringify(cacheData));
@@ -192,11 +187,7 @@ function App() {
         {results && (
           <div className="results-container">
             <div className="results-header">
-              <h2>
-                {results.mode === 'pro_comparison'
-                  ? `You vs ${results.pro_info?.name}`
-                  : 'Your 2025 Recap'}
-              </h2>
+              <h2>Your 2025 Recap</h2>
               <p className="results-subheader">
                 Current Rank: <span className={`rank-badge ${getRankClass(results.your_rank)}`}>{results.your_rank}</span>
               </p>
@@ -206,7 +197,7 @@ function App() {
                   const lastSearch = sessionStorage.getItem('lastSearch');
                   if (lastSearch) {
                     const { summonerName, region } = JSON.parse(lastSearch);
-                    handleAnalyze(summonerName, region, null, false);
+                    handleAnalyze(summonerName, region, false);
                   }
                 }}
               >
@@ -216,8 +207,6 @@ function App() {
 
             <PostcardCarousel
               postcards={results.postcards}
-              mode={results.mode}
-              proInfo={results.pro_info}
             />
           </div>
         )}

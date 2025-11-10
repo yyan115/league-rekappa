@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import html2canvas from 'html2canvas';
 import './PostcardCarousel.css';
 
-function PostcardCarousel({ postcards, mode, proInfo }) {
+function PostcardCarousel({ postcards }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showShareMenu, setShowShareMenu] = useState(false);
   const postcardRef = useRef(null);
@@ -143,34 +143,14 @@ function PostcardCarousel({ postcards, mode, proInfo }) {
           {/* Header */}
           <div className="postcard-header">
             <h2 className="postcard-title">{currentCard.title}</h2>
-            {mode === 'pro_comparison' && proInfo && currentIndex === 0 && (
-              <div className="pro-badge">
-                {proInfo.name} - {proInfo.team}
-              </div>
-            )}
           </div>
 
           {/* Content */}
           <div className="postcard-content">
             <p className="postcard-text">{currentCard.content}</p>
 
-            {/* Stats display for comparison cards */}
-            {currentCard.type === 'comparison' && (
-              <div className="stat-comparison">
-                <div className="stat-box your-stat">
-                  <span className="stat-label">You</span>
-                  <span className="stat-value">{currentCard.your_stat || '-'}</span>
-                </div>
-                <div className="stat-divider">VS</div>
-                <div className="stat-box pro-stat">
-                  <span className="stat-label">{proInfo?.name || 'Pro'}</span>
-                  <span className="stat-value">{currentCard.pro_stat || '-'}</span>
-                </div>
-              </div>
-            )}
-
             {/* Single stat highlight */}
-            {currentCard.stat && currentCard.type !== 'comparison' && (
+            {currentCard.stat && (
               <div className="stat-highlight">
                 {currentCard.stat}
               </div>

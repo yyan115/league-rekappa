@@ -1,25 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import './SearchForm.css';
 
 function SearchForm({ onAnalyze, loading }) {
   const [summonerName, setSummonerName] = useState('');
   const [region, setRegion] = useState('na1');
-  const [proPlayers, setProPlayers] = useState({});
-  const [selectedPro, setSelectedPro] = useState('');
-  const [showProDropdown, setShowProDropdown] = useState(false);
-
-  useEffect(() => {
-    // Fetch pro player list on mount
-    fetch('/api/pro-players')
-      .then(res => res.json())
-      .then(data => setProPlayers(data))
-      .catch(err => console.error('Failed to load pro players:', err));
-  }, []);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (summonerName.trim()) {
-      onAnalyze(summonerName.trim(), region, selectedPro || null);
+      onAnalyze(summonerName.trim(), region);
     }
   };
 
@@ -63,47 +52,6 @@ function SearchForm({ onAnalyze, loading }) {
             <option value="jp1">JP</option>
           </select>
         </div>
-
-        {/* Pro player comparison - DISABLED FOR NOW
-        <div className="form-group">
-          <label className="pro-compare-toggle">
-            <input
-              type="checkbox"
-              checked={showProDropdown}
-              onChange={(e) => {
-                setShowProDropdown(e.target.checked);
-                if (!e.target.checked) setSelectedPro('');
-              }}
-              disabled={loading}
-            />
-            <span>Compare with a pro player</span>
-          </label>
-        </div>
-
-        {showProDropdown && (
-          <div className="form-group">
-            <select
-              value={selectedPro}
-              onChange={(e) => setSelectedPro(e.target.value)}
-              className="pro-select"
-              disabled={loading}
-            >
-              <option value="">Select a pro player...</option>
-              {Object.entries(proPlayers).map(([league, teams]) => (
-                <optgroup key={league} label={league}>
-                  {Object.entries(teams).map(([teamName, players]) =>
-                    players.map(player => (
-                      <option key={player.id} value={player.id}>
-                        {player.name} ({teamName} - {player.role})
-                      </option>
-                    ))
-                  )}
-                </optgroup>
-              ))}
-            </select>
-          </div>
-        )}
-        */}
 
         <button type="submit" className="analyze-button" disabled={loading}>
           {loading ? 'LOADING...' : 'ROAST ME'}

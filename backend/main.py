@@ -17,7 +17,6 @@ from analysis import (
     detect_achievements
 )
 from bedrock_client import BedrockClient
-from pro_players import PRO_PLAYERS, get_pro_by_id, get_all_teams
 
 # Load environment variables
 load_dotenv()
@@ -25,9 +24,10 @@ load_dotenv()
 app = FastAPI(title="Roast Player API")
 
 # CORS for frontend
+allowed_origins = os.getenv('ALLOWED_ORIGINS', 'http://localhost:5173').split(',')
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In production, specify your frontend URL
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -43,56 +43,24 @@ bedrock_client = BedrockClient()
 class AnalysisRequest(BaseModel):
     summoner_name: str
     region: Optional[str] = "na1"
-    pro_player_id: Optional[str] = None  # Optional pro player comparison
 
 class PostcardResponse(BaseModel):
     status: str
-    mode: str  # "year_review" or "pro_comparison"
     your_rank: str
     your_stats: Dict
-    pro_stats: Optional[Dict] = None
-    pro_info: Optional[Dict] = None
     postcards: List[Dict]  # List of postcard data
 
 @app.get("/")
 async def root():
     return {
-        "message": "Roast Player API - League Year in Review",
+        "message": "League Rekap-pa API - 2025 Season Roasts",
         "status": "running",
         "endpoints": {
-            "analyze": "/analyze",
-            "pro_players": "/pro-players",
+            "analyze_stream": "/api/analyze-stream",
+            "regenerate": "/api/regenerate-roasts",
             "health": "/health"
         }
     }
-
-@app.get("/pro-players")
-async def get_pro_players():
-    """Get list of all pro players organized by league/team"""
-    teams_by_league = get_all_teams()
-
-    # Organize players by league and team
-    organized = {}
-    for league in ['LCK', 'LEC', 'LCS', 'LTA']:
-        organized[league] = {}
-
-    for pro_id, pro_data in PRO_PLAYERS.items():
-        league = pro_data['league']
-        team = pro_data['team']
-
-        if league not in organized:
-            organized[league] = {}
-        if team not in organized[league]:
-            organized[league][team] = []
-
-        organized[league][team].append({
-            'id': pro_id,
-            'name': pro_data['name'],
-            'role': pro_data['role'],
-            'riot_id': pro_data['riot_id']
-        })
-
-    return organized
 
 @app.get("/health")
 async def health():
@@ -133,7 +101,6 @@ async def analyze_player_stream(request: AnalysisRequest):
         try:
             summoner_name = request.summoner_name
             region = request.region or "na1"
-            pro_player_id = request.pro_player_id
 
             # Set callback for rate limits
             riot_client.rate_limit_callback = rate_limit_callback
@@ -272,7 +239,6 @@ async def analyze_player(request: AnalysisRequest):
     try:
         summoner_name = request.summoner_name
         region = request.region or "na1"
-        pro_player_id = request.pro_player_id
 
         # Update riot client region if needed
         if region != riot_client.region:
@@ -341,106 +307,20 @@ async def analyze_player(request: AnalysisRequest):
         # Detect achievements/badges
         achievements = detect_achievements(your_raw_stats, your_aggregated)
 
-        # MODE SELECTION: Pro comparison or Year review
-        mode = "pro_comparison" if pro_player_id else "year_review"
+        # Generate year review postcards
+        print(f"[5/5] Generating year review postcards...")
+        postcards, _ = bedrock_client.generate_year_review_postcards(
+            your_aggregated,
+            your_rank,
+            achievements
+        )
 
-        if mode == "pro_comparison":
-            print(f"[5/5] Comparing with pro player...")
-            # Get pro player info
-            pro_info = get_pro_by_id(pro_player_id)
-            if not pro_info:
-                raise HTTPException(status_code=404, detail=f"Pro player '{pro_player_id}' not found")
-
-            # Fetch pro player stats
-            pro_region = pro_info['region']
-            pro_riot_id = pro_info['riot_id']
-
-            # Update region for pro if needed
-            if pro_region != riot_client.region:
-                riot_client.region = pro_region
-                riot_client.base_url = f"https://{pro_region}.api.riotgames.com"
-
-                # Update routing (account-v1 and match-v5 are different!)
-                account_routing = {
-                    'na1': 'americas', 'br1': 'americas', 'la1': 'americas', 'la2': 'americas',
-                    'euw1': 'europe', 'eun1': 'europe', 'tr1': 'europe', 'ru': 'europe',
-                    'kr': 'asia', 'jp1': 'asia',
-                    'oc1': 'asia', 'sg2': 'asia', 'th2': 'asia', 'tw2': 'asia', 'vn2': 'asia', 'ph2': 'asia',
-                }
-                match_routing = {
-                    'na1': 'americas', 'br1': 'americas', 'la1': 'americas', 'la2': 'americas',
-                    'euw1': 'europe', 'eun1': 'europe', 'tr1': 'europe', 'ru': 'europe',
-                    'kr': 'asia', 'jp1': 'asia',
-                    'oc1': 'sea', 'sg2': 'sea', 'th2': 'sea', 'tw2': 'sea', 'vn2': 'sea', 'ph2': 'sea',
-                }
-                riot_client.account_routing = account_routing.get(pro_region, 'americas')
-                riot_client.match_routing = match_routing.get(pro_region, 'americas')
-                riot_client.regional_url = f"https://{riot_client.match_routing}.api.riotgames.com"
-
-            pro_summoner = riot_client.get_summoner_by_name(pro_riot_id)
-            if not pro_summoner:
-                raise HTTPException(status_code=404, detail=f"Pro player account '{pro_riot_id}' not found")
-
-            pro_puuid = pro_summoner['puuid']
-            pro_rank_info = riot_client.get_rank_by_puuid(pro_puuid)
-            pro_rank = get_rank_tier(pro_rank_info) or "Unknown"
-
-            # Get pro match history
-            pro_match_ids = riot_client.get_match_ids(pro_puuid, count=100, start_time=start_of_year)
-            pro_matches = []
-            for match_id in pro_match_ids[:100]:
-                match_detail = riot_client.get_match_details(match_id)
-                if match_detail and match_detail['info'].get('queueId') == 420:
-                    pro_matches.append(match_detail)
-
-            if len(pro_matches) < 5:
-                raise HTTPException(status_code=400, detail=f"{pro_info['name']} doesn't have enough ranked games")
-
-            pro_raw_stats = calculate_player_stats(pro_matches, pro_puuid)
-            pro_aggregated = aggregate_stats(pro_raw_stats)
-
-            # Generate comparison postcards
-            postcards = bedrock_client.generate_comparison_postcards(
-                your_aggregated,
-                pro_aggregated,
-                your_rank,
-                pro_rank,
-                pro_info['name'],
-                pro_info['team']
-            )
-
-            return PostcardResponse(
-                status="success",
-                mode="pro_comparison",
-                your_rank=your_rank,
-                your_stats=your_aggregated,
-                pro_stats=pro_aggregated,
-                pro_info={
-                    'name': pro_info['name'],
-                    'team': pro_info['team'],
-                    'role': pro_info['role'],
-                    'rank': pro_rank
-                },
-                postcards=postcards
-            )
-
-        else:  # year_review mode
-            print(f"[5/5] Generating year review postcards...")
-
-            # Generate year review postcards
-            postcards = bedrock_client.generate_year_review_postcards(
-                your_aggregated,
-                your_rank,
-                achievements
-            )
-
-            return PostcardResponse(
-                status="success",
-                mode="year_review",
-                your_rank=your_rank,
-                your_stats=your_aggregated,
-                postcards=postcards
-            )
+        return PostcardResponse(
+            status="success",
+            your_rank=your_rank,
+            your_stats=your_aggregated,
+            postcards=postcards
+        )
 
     except HTTPException:
         raise
