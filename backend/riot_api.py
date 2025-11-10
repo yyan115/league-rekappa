@@ -9,6 +9,7 @@ class RiotAPIClient:
         self.api_key = api_key
         self.region = region
         self.rate_limit_callback = rate_limit_callback
+        self.pending_rate_limit = None  # Store seconds to wait
 
         # Regional routing - different for account-v1 vs match-v5!
         # account-v1: americas, asia, europe (3 values)
@@ -54,8 +55,13 @@ class RiotAPIClient:
                     retry_after = int(response.headers.get('Retry-After', 1))
                     print(f"[RATE_LIMIT] Waiting {retry_after} seconds...")
                     if self.rate_limit_callback:
+                        # Store the rate limit info and return None immediately
+                        # Main loop will handle the sleep and yielding
+                        self.pending_rate_limit = retry_after
                         self.rate_limit_callback(retry_after)
-                    time.sleep(retry_after)
+                        return None
+                    else:
+                        time.sleep(retry_after)
                 elif response.status_code == 404:
                     return None
                 else:

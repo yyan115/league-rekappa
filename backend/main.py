@@ -5,6 +5,7 @@ from pydantic import BaseModel
 from typing import Optional, List, Dict
 import os
 import json
+import time
 import asyncio
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
@@ -124,7 +125,9 @@ async def analyze_player_stream(request: AnalysisRequest):
     rate_limit_message = {"message": None}
 
     def rate_limit_callback(seconds):
-        rate_limit_message["message"] = f"Rate limited. Waiting {seconds}s..."
+        msg = f"Rate limited. Waiting {seconds}s..."
+        rate_limit_message["message"] = msg
+        print(f"[CALLBACK] Rate limit callback triggered: {msg}")
 
     async def generate():
         try:
@@ -195,15 +198,31 @@ async def analyze_player_stream(request: AnalysisRequest):
             # 4. Get match details with per-match progress
             matches = []
             total_matches = min(len(match_ids), 100)
-            for idx, match_id in enumerate(match_ids[:100], 1):
-                yield f"data: {json.dumps({'progress': f'Analyzing matches ({idx}/{total_matches})...', 'status': 'running'})}\n\n"
+            current_progress = ""
+            last_rate_limit_time = 0
 
+            for idx, match_id in enumerate(match_ids[:100], 1):
+                current_progress = f'Analyzing matches ({idx}/{total_matches})...'
+                yield f"data: {json.dumps({'progress': current_progress, 'status': 'running'})}\n\n"
+
+                # Call get_match_details - it will return None immediately if rate limited
                 match_detail = riot_client.get_match_details(match_id)
 
-                # Check if rate limit message was set
-                if rate_limit_message["message"]:
-                    yield f"data: {json.dumps({'progress': rate_limit_message['message'], 'status': 'running'})}\n\n"
-                    rate_limit_message["message"] = None  # Clear it
+                # Check if we got rate limited (riot_client.pending_rate_limit will be set)
+                if riot_client.pending_rate_limit:
+                    wait_seconds = riot_client.pending_rate_limit
+                    print(f"[YIELD] Rate limited! Showing countdown on frontend...")
+
+                    # Countdown while yielding updates
+                    for remaining in range(wait_seconds, 0, -1):
+                        rate_msg = f'Rate limited. Waiting {remaining}s...'
+                        yield f"data: {json.dumps({'progress': current_progress, 'rate_limit': rate_msg, 'status': 'running'})}\n\n"
+                        time.sleep(1)
+
+                    # Clear the rate limit and retry the call
+                    riot_client.pending_rate_limit = None
+                    rate_limit_message["message"] = None
+                    match_detail = riot_client.get_match_details(match_id)
 
                 if match_detail and match_detail['info'].get('queueId') == 420:
                     matches.append(match_detail)

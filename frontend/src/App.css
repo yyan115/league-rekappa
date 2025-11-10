@@ -122,6 +122,14 @@
   50% { opacity: 0.7; }
 }
 
+.rate-limit-message {
+  color: #ff9800 !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  margin: 5px 0 !important;
+  text-shadow: 0 0 8px rgba(255, 152, 0, 0.5);
+}
+
 .loading-detail {
   color: #a09b8c;
   font-size: 0.9rem;
@@ -153,7 +161,6 @@
 
 .rank-badge {
   display: inline-block;
-  background: linear-gradient(135deg, #c89b3c 0%, #785a28 100%);
   padding: 8px 20px;
   border-radius: 0;
   font-weight: 700;
@@ -166,11 +173,83 @@
               inset 0 2px 0 rgba(255, 255, 255, 0.2);
 }
 
+.rank-badge.iron {
+  background: linear-gradient(135deg, #4a4a4a 0%, #2d2d2d 100%);
+  border-color: #4a4a4a;
+  box-shadow: 0 0 15px rgba(74, 74, 74, 0.5), inset 0 2px 0 rgba(255, 255, 255, 0.2);
+  color: #f0e6d2;
+}
+
+.rank-badge.bronze {
+  background: linear-gradient(135deg, #8b5a3c 0%, #5c3a28 100%);
+  border-color: #8b5a3c;
+  box-shadow: 0 0 15px rgba(139, 90, 60, 0.5), inset 0 2px 0 rgba(255, 255, 255, 0.2);
+}
+
+.rank-badge.silver {
+  background: linear-gradient(135deg, #b0b0b0 0%, #707070 100%);
+  border-color: #d0d0d0;
+  box-shadow: 0 0 15px rgba(176, 176, 176, 0.5), inset 0 2px 0 rgba(255, 255, 255, 0.2);
+}
+
+.rank-badge.gold {
+  background: linear-gradient(135deg, #c89b3c 0%, #785a28 100%);
+  border-color: #f0e6d2;
+  box-shadow: 0 0 15px rgba(200, 155, 60, 0.5), inset 0 2px 0 rgba(255, 255, 255, 0.2);
+}
+
+.rank-badge.platinum {
+  background: linear-gradient(135deg, #4a9a9a 0%, #2d6060 100%);
+  border-color: #5fc3c3;
+  box-shadow: 0 0 15px rgba(74, 154, 154, 0.5), inset 0 2px 0 rgba(255, 255, 255, 0.2);
+  color: #f0e6d2;
+}
+
+.rank-badge.emerald {
+  background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
+  border-color: #4caf50;
+  box-shadow: 0 0 15px rgba(46, 125, 50, 0.5), inset 0 2px 0 rgba(255, 255, 255, 0.2);
+  color: #f0e6d2;
+}
+
+.rank-badge.diamond {
+  background: linear-gradient(135deg, #5b7fcc 0%, #3d5999 100%);
+  border-color: #7ba3ff;
+  box-shadow: 0 0 15px rgba(91, 127, 204, 0.5), inset 0 2px 0 rgba(255, 255, 255, 0.2);
+  color: #f0e6d2;
+}
+
+.rank-badge.master {
+  background: linear-gradient(135deg, #8e44ad 0%, #6c3483 100%);
+  border-color: #a569bd;
+  box-shadow: 0 0 15px rgba(142, 68, 173, 0.5), inset 0 2px 0 rgba(255, 255, 255, 0.2);
+  color: #f0e6d2;
+}
+
+.rank-badge.grandmaster {
+  background: linear-gradient(135deg, #c0392b 0%, #922b21 100%);
+  border-color: #e74c3c;
+  box-shadow: 0 0 15px rgba(192, 57, 43, 0.5), inset 0 2px 0 rgba(255, 255, 255, 0.2);
+  color: #f0e6d2;
+}
+
+.rank-badge.challenger {
+  background: linear-gradient(135deg, #f39c12 0%, #d68910 100%);
+  border-color: #f1c40f;
+  box-shadow: 0 0 20px rgba(243, 156, 18, 0.7), inset 0 2px 0 rgba(255, 255, 255, 0.3);
+  animation: challengerGlow 2s ease-in-out infinite;
+}
+
+@keyframes challengerGlow {
+  0%, 100% { box-shadow: 0 0 20px rgba(243, 156, 18, 0.7), inset 0 2px 0 rgba(255, 255, 255, 0.3); }
+  50% { box-shadow: 0 0 30px rgba(243, 156, 18, 1), inset 0 2px 0 rgba(255, 255, 255, 0.3); }
+}
+
 .roast-again-btn {
   margin-top: 20px;
   padding: 12px 30px;
-  background: linear-gradient(180deg, #c89b3c 0%, #785a28 100%);
-  color: #0a1428;
+  background: linear-gradient(180deg, #c81e1e 0%, #8a1515 100%);
+  color: #f0e6d2;
   border: 2px solid #f0e6d2;
   font-size: 1rem;
   font-weight: 800;
@@ -178,16 +257,16 @@
   transition: all 0.2s ease;
   text-transform: uppercase;
   letter-spacing: 2px;
-  box-shadow: 0 0 15px rgba(200, 155, 60, 0.4),
-              inset 0 2px 0 rgba(255, 255, 255, 0.3);
+  box-shadow: 0 0 15px rgba(200, 30, 30, 0.4),
+              inset 0 2px 0 rgba(255, 255, 255, 0.2);
 }
 
 .roast-again-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 0 25px rgba(200, 155, 60, 0.6),
-              0 6px 20px rgba(200, 155, 60, 0.3),
-              inset 0 2px 0 rgba(255, 255, 255, 0.3);
-  background: linear-gradient(180deg, #d4a73e 0%, #8a6530 100%);
+  box-shadow: 0 0 25px rgba(200, 30, 30, 0.6),
+              0 6px 20px rgba(200, 30, 30, 0.3),
+              inset 0 2px 0 rgba(255, 255, 255, 0.2);
+  background: linear-gradient(180deg, #d82828 0%, #9a1818 100%);
 }
 
 .footer {

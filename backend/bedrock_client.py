@@ -41,21 +41,27 @@ class BedrockClient:
         if used_topics:
             avoid_topics = f"\n\nDON'T REPEAT THESE TOPICS (already roasted):\n{', '.join(used_topics)}\n\nPick DIFFERENT stats to roast."
 
-        prompt = f"""Write 5-7 funny roasts about this player's 2025 ranked season. Match the exact tone and style of these examples:{avoid_topics}
+        # Only warn about sample size if we got 99-100 games (means we hit the limit and they likely played more)
+        sample_warning = ""
+        total_games = your_stats.get('total_games', 0)
+        if total_games >= 99:
+            sample_warning = f"\n\nIMPORTANT: We only grabbed their last 100 games from 2025, so they likely played way more than {total_games} total. Don't roast them about only playing {total_games} games."
+
+        prompt = f"""Write 5-7 funny roasts about this player's 2025 ranked season. Mix dry wit with occasional dad joke energy - the kind that's so stupid it's funny.{avoid_topics}{sample_warning}
 
 IMPORTANT: The current year is 2025. Reference stats as being from 2025, not 2024.
 
 EXAMPLES OF THE VIBE:
-- "35% winrate on Yasuo after 50 games. They said you couldn't do it. They were right."
-- "Lost 8 games in a row and queued up for a 9th. That's not int, that's commitment."
-- "127 games in Silver II. Rome wasn't built in a day, but it didn't take this long either."
-- "Tried 15 different champions. None of them worked. The common factor? Couldn't be you."
-- "4.2 KDA in losses, 2.1 KDA in wins. You're an MVP for the wrong team."
-- "Played 80 games on your main with 42% winrate. Practice makes... well, not perfect apparently."
+- "35% winrate on Yasuo after 50 games. They said you couldn't do it. They were right." (dry wit)
+- "Lost 8 games in a row and queued up for a 9th. That's not int, that's commitment." (dry wit)
+- "127 games in Silver II. Rome wasn't built in a day, but it didn't take this long either." (dry wit)
+- "6 deaths per game. You're not feeding, you're running a charity buffet." (dad joke energy)
+- "Played 15 different champions. Turns out the problem follows you around." (dry wit)
+- "42% winrate on your main. At least you're consistently inconsistent." (dad joke wordplay)
 
 THEIR STATS:
 - Rank: {your_rank}
-- Games played: {your_stats.get('total_games', 0)}
+- Games analyzed: {your_stats.get('total_games', 0)}
 - Overall winrate: {your_stats.get('win_rate', 0)}%
 - Most played: {top_champ} ({top_champ_games} games, {top_champ_wr}% WR)
 - Second most: {second_champ_name} ({second_champ_games} games, {second_champ_wr}% WR)

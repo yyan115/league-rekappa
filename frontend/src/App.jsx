@@ -8,12 +8,30 @@ function App() {
   const [results, setResults] = useState(null);
   const [error, setError] = useState(null);
   const [progressMessage, setProgressMessage] = useState('');
+  const [rateLimitMessage, setRateLimitMessage] = useState('');
+
+  const getRankClass = (rank) => {
+    if (!rank) return 'gold';
+    const rankLower = rank.toLowerCase();
+    if (rankLower.includes('iron')) return 'iron';
+    if (rankLower.includes('bronze')) return 'bronze';
+    if (rankLower.includes('silver')) return 'silver';
+    if (rankLower.includes('gold')) return 'gold';
+    if (rankLower.includes('platinum')) return 'platinum';
+    if (rankLower.includes('emerald')) return 'emerald';
+    if (rankLower.includes('diamond')) return 'diamond';
+    if (rankLower.includes('master')) return 'master';
+    if (rankLower.includes('grandmaster')) return 'grandmaster';
+    if (rankLower.includes('challenger')) return 'challenger';
+    return 'gold';
+  };
 
   const handleAnalyze = async (summonerName, region, proPlayerId, forceRefresh = false) => {
     setLoading(true);
     setError(null);
     setResults(null);
     setProgressMessage('Starting...');
+    setRateLimitMessage('');
 
     // Save last search
     sessionStorage.setItem('lastSearch', JSON.stringify({ summonerName, region }));
@@ -22,6 +40,7 @@ function App() {
       // Check cache first
       const cacheKey = `${summonerName.toLowerCase()}_${region}`;
       const cached = sessionStorage.getItem(cacheKey);
+      console.log(`Cache check: key="${cacheKey}", found=${!!cached}, forceRefresh=${forceRefresh}`);
 
       if (cached && !forceRefresh) {
         setProgressMessage('Regenerating roasts...');
@@ -96,6 +115,12 @@ function App() {
                 setProgressMessage(data.progress);
               }
 
+              if (data.rate_limit) {
+                setRateLimitMessage(data.rate_limit);
+              } else {
+                setRateLimitMessage('');
+              }
+
               if (data.error) {
                 setError(data.error);
                 setLoading(false);
@@ -138,10 +163,10 @@ function App() {
     <div className="app">
       <div className="container">
         <header className="header">
-          <h1 className="title">LEAGUE ROASTED</h1>
+          <h1 className="title">LEAGUE REKAP-PA</h1>
           <div className="subtitle">2025 SEASON RECAP</div>
           <p className="description">
-            Your ranked stats, but make it hurt.
+            Your ranked stats for 2025, roasted (maybe).
           </p>
         </header>
 
@@ -157,6 +182,9 @@ function App() {
           <div className="loading">
             <div className="spinner"></div>
             <p className="progress-message">{progressMessage || 'Starting...'}</p>
+            {rateLimitMessage && (
+              <p className="rate-limit-message">{rateLimitMessage}</p>
+            )}
             <p className="loading-detail">This may take 1-2 minutes</p>
           </div>
         )}
@@ -170,7 +198,7 @@ function App() {
                   : 'Your 2025 Recap'}
               </h2>
               <p className="results-subheader">
-                Current Rank: <span className="rank-badge">{results.your_rank}</span>
+                Current Rank: <span className={`rank-badge ${getRankClass(results.your_rank)}`}>{results.your_rank}</span>
               </p>
               <button
                 className="roast-again-btn"
