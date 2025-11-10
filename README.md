@@ -2,11 +2,11 @@
 
 **Rift Rewind Hackathon 2025**
 
-A League of Legends year-in-review application that analyzes your 2025 ranked season and generates AI-powered roasts based on your gameplay statistics.
+A League of Legends year-in-review application that analyzes your 2025 ranked season and generates AI-powered roasts based on your league 2025 ranked game statistics.
 
 ## Overview
 
-League Rekap-pa is an end-of-year recap tool that fetches your recent ranked match history, analyzes your performance statistics, and uses AWS Bedrock (Claude 3.5 Sonnet) to generate humorous roasts presented as shareable postcards. Think Spotify Wrapped, but for League of Legends... and it roasts you.
+League Rekap-pa is an end-of-year recap tool that fetches your recent ranked match history, analyzes your performance statistics, and uses AWS Bedrock (Claude 3.5 Sonnet) to generate humorous roasts presented as shareable postcards.
 
 ## Inspiration and Evolution
 
@@ -14,9 +14,9 @@ This project went through several iterations before arriving at its current form
 
 The focus then shifted to comparative analysis - comparing player stats against slightly higher-ranked players to identify improvement areas. This approach ran into API rate limiting issues when trying to fetch data for multiple players.
 
-After experimenting with pro player comparisons, it became clear that the statistical gap between casual players and professionals was so vast that the comparisons were more humorous than instructive. This led to the final concept: leaning fully into entertainment by generating witty roasts based on the player's own statistics, without comparison to others.
+After experimenting with pro player comparisons, it became clear that the statistical gap between casual players and professionals was so vast that the comparisons were more humorous than instructive. This led to the final concept: leaning fully into entertainment by generating witty roasts based on the player's own statistics, without comparison to others. Professional comparisons were then scrapped due to time concerns.
 
-The result is a tool that's designed to be funny rather than instructive. LLMs excel at dry humor and "so stupid it's funny" observations, which pairs well with the absurdities found in ranked gameplay statistics.
+The result is a tool that's designed to be funny rather than instructive. LLMs tend to do better at dry humor, so we leaned into it.
 
 ## Features
 
