@@ -9,7 +9,7 @@
 }
 
 .postcard {
-  background: linear-gradient(180deg, #0a1428 0%, #010a13 100%);
+  background: linear-gradient(180deg, #0f1c35 0%, #051018 100%);
   border-radius: 0;
   padding: 3rem 2rem;
   min-height: 450px;
@@ -41,45 +41,45 @@
 }
 
 .postcard-intro {
-  background: linear-gradient(180deg, #0a1428 0%, #010a13 100%);
+  background: linear-gradient(180deg, #221c15 0%, #0a0f15 100%);
   box-shadow: 0 0 40px rgba(200, 155, 60, 0.5),
-              inset 0 0 0 3px #c89b3c,
+              inset 0 0 0 3px rgba(200, 155, 60, 0.6),
               0 20px 60px rgba(0, 0, 0, 0.8);
 }
 
 .postcard-stat {
-  background: linear-gradient(180deg, #0f1e33 0%, #010a13 100%);
-  box-shadow: 0 0 40px rgba(0, 150, 255, 0.3),
-              inset 0 0 0 3px rgba(0, 150, 255, 0.5),
+  background: linear-gradient(180deg, #0f1c35 0%, #0a0f18 100%);
+  box-shadow: 0 0 40px rgba(200, 155, 60, 0.4),
+              inset 0 0 0 3px rgba(200, 155, 60, 0.5),
               0 20px 60px rgba(0, 0, 0, 0.8);
 }
 
 .postcard-roast {
-  background: linear-gradient(180deg, #2d0a0a 0%, #010a13 100%);
+  background: linear-gradient(180deg, #251212 0%, #0a0f15 100%);
   box-shadow: 0 0 40px rgba(200, 30, 30, 0.4),
-              inset 0 0 0 3px rgba(200, 30, 30, 0.6),
+              inset 0 0 0 3px rgba(200, 30, 30, 0.5),
               0 20px 60px rgba(0, 0, 0, 0.8);
 }
 
 .postcard-comparison {
-  background: linear-gradient(180deg, #1a0a28 0%, #010a13 100%);
+  background: linear-gradient(180deg, #181025 0%, #0a0f15 100%);
   box-shadow: 0 0 40px rgba(150, 50, 200, 0.3),
-              inset 0 0 0 3px rgba(150, 50, 200, 0.5),
+              inset 0 0 0 3px rgba(150, 50, 200, 0.4),
               0 20px 60px rgba(0, 0, 0, 0.8);
 }
 
 .postcard-copium {
-  background: linear-gradient(180deg, #0a281e 0%, #010a13 100%);
+  background: linear-gradient(180deg, #0f251e 0%, #0a0f15 100%);
   box-shadow: 0 0 40px rgba(50, 200, 150, 0.3),
-              inset 0 0 0 3px rgba(50, 200, 150, 0.5),
+              inset 0 0 0 3px rgba(50, 200, 150, 0.4),
               0 20px 60px rgba(0, 0, 0, 0.8);
   color: #f0e6d2;
 }
 
 .postcard-achievement {
-  background: linear-gradient(180deg, #281a0a 0%, #010a13 100%);
+  background: linear-gradient(180deg, #221c15 0%, #0a0f15 100%);
   box-shadow: 0 0 40px rgba(255, 150, 50, 0.3),
-              inset 0 0 0 3px rgba(255, 150, 50, 0.5),
+              inset 0 0 0 3px rgba(255, 150, 50, 0.4),
               0 20px 60px rgba(0, 0, 0, 0.8);
 }
 
